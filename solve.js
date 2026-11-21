@@ -33,7 +33,7 @@ export function run(input) {
   // quoted part a closing quote left). Returns the number of characters kept, which is what tells a
   // quoted field that junk followed its closing quote.
   function readUnquoted(start) {
-    let parts = null;
+    let parts = start === '' ? null : [start];
     let segStart = pos;
     let kept = 0;
     let i = pos;
@@ -42,10 +42,9 @@ export function run(input) {
       if (c === COMMA || c === LF) {
         if (parts !== null) {
           if (i > segStart) parts.push(text.slice(segStart, i));
-          if (start !== '' || parts.length === 0) parts.unshift(start);
           value = parts.join('');
         } else {
-          value = start + text.slice(segStart, i);
+          value = text.slice(segStart, i);
         }
         kept += i - segStart;
         if (c === COMMA) {
@@ -62,10 +61,9 @@ export function run(input) {
         if (text.charCodeAt(i + 1) === LF) {
           if (parts !== null) {
             if (i > segStart) parts.push(text.slice(segStart, i));
-            if (start !== '' || parts.length === 0) parts.unshift(start);
             value = parts.join('');
           } else {
-            value = start + text.slice(segStart, i);
+            value = text.slice(segStart, i);
           }
           kept += i - segStart;
           pos = i + 2;
@@ -73,7 +71,7 @@ export function run(input) {
           ended = BREAK_END;
           return kept;
         }
-        if (parts === null) parts = [start];
+        if (parts === null) parts = [];
         if (i > segStart) parts.push(text.slice(segStart, i));
         kept += i - segStart;
         errors.push({ code: 'stray_cr', line: recordLine, row: recordRow });
